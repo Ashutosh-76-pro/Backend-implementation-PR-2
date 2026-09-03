@@ -1,0 +1,117 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Country {
+  id        String   @id @default(cuid())
+  name      String
+  code      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  states    State[]
+}
+
+model State {
+  id        String   @id @default(cuid())
+  code      String
+  name      String
+  countryId String
+  country   Country  @relation(fields: [countryId], references: [id], onDelete: Cascade)
+  districts District[]
+  access    UserStateAccess[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([countryId, code])
+  @@index([name])
+}
+
+model District {
+  id        String   @id @default(cuid())
+  code      String
+  name      String
+  stateId   String
+  state     State    @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  subDistricts SubDistrict[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([stateId, code])
+  @@index([name])
+}
+
+model SubDistrict {
+  id        String   @id @default(cuid())
+  code      String
+  name      String
+  districtId String
+  district  District @relation(fields: [districtId], references: [id], onDelete: Cascade)
+  villages  Village[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@unique([districtId, code])
+  @@index([name])
+}
+
+model Village {
+  id            String      @id @default(cuid())
+  code          String      @unique
+  name          String
+  subDistrictId String
+  subDistrict   SubDistrict @relation(fields: [subDistrictId], references: [id], onDelete: Cascade)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  @@index([subDistrictId])
+  @@index([name])
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  planType  String   @default("demo")
+  role      String   @default("client")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  apiKeys   ApiKey[]
+  access    UserStateAccess[]
+  logs      ApiLog[]
+}
+
+model ApiKey {
+  id         String   @id @default(cuid())
+  key        String   @unique
+  secretHash String
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs       ApiLog[]
+  createdAt  DateTime @default(now())
+  @@index([userId])
+}
+
+model UserStateAccess {
+  userId  String
+  stateId String
+  user    User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  state   State @relation(fields: [stateId], references: [id], onDelete: Cascade)
+  @@id([userId, stateId])
+  @@index([stateId])
+}
+
+model ApiLog {
+  id           String   @id @default(cuid())
+  endpoint     String
+  method       String
+  statusCode   Int
+  responseTime Int
+  userId       String?
+  apiKeyId     String?
+  user         User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+  apiKey       ApiKey? @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  createdAt    DateTime @default(now())
+  @@index([createdAt, userId])
+  @@index([apiKeyId, createdAt])
+}
