@@ -1,0 +1,14 @@
+PRAGMA foreign_keys = ON;
+
+CREATE TABLE IF NOT EXISTS sectors (sector_id INTEGER PRIMARY KEY, sector_name TEXT UNIQUE NOT NULL);
+CREATE TABLE IF NOT EXISTS companies (company_id INTEGER PRIMARY KEY, ticker TEXT UNIQUE NOT NULL, company_name TEXT NOT NULL, sector_id INTEGER, bse_code TEXT, url TEXT, FOREIGN KEY (sector_id) REFERENCES sectors(sector_id));
+CREATE TABLE IF NOT EXISTS profitandloss (company_id INTEGER NOT NULL, year INTEGER NOT NULL, sales REAL, operating_profit REAL, opm REAL, eps REAL, tax_rate REAL, dividend REAL, PRIMARY KEY (company_id,year), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS balancesheet (company_id INTEGER NOT NULL, year INTEGER NOT NULL, equity REAL, liabilities REAL, assets REAL, cash REAL, debt REAL, PRIMARY KEY(company_id,year), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS cashflow (company_id INTEGER NOT NULL, year INTEGER NOT NULL, cash_from_operating REAL, cash_from_investing REAL, cash_from_financing REAL, net_cash_change REAL, PRIMARY KEY(company_id,year), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS analysis (company_id INTEGER NOT NULL, year INTEGER NOT NULL, metric TEXT NOT NULL, value REAL, PRIMARY KEY(company_id,year,metric), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS documents (document_id INTEGER PRIMARY KEY AUTOINCREMENT, company_id INTEGER NOT NULL, url TEXT, document_type TEXT, document_year INTEGER, FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS prosandcons (company_id INTEGER NOT NULL, item_type TEXT NOT NULL, item_text TEXT NOT NULL, PRIMARY KEY(company_id,item_type,item_text), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS stock_prices (company_id INTEGER NOT NULL, trade_date TEXT NOT NULL, open REAL, high REAL, low REAL, close REAL, volume REAL, PRIMARY KEY(company_id,trade_date), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS financial_ratios (company_id INTEGER NOT NULL, year INTEGER NOT NULL, ratio_name TEXT NOT NULL, ratio_value REAL, PRIMARY KEY(company_id,year,ratio_name), FOREIGN KEY(company_id) REFERENCES companies(company_id));
+CREATE TABLE IF NOT EXISTS peer_groups (peer_group_id INTEGER PRIMARY KEY, company_id INTEGER NOT NULL, peer_company_id INTEGER NOT NULL, group_name TEXT, FOREIGN KEY(company_id) REFERENCES companies(company_id), FOREIGN KEY(peer_company_id) REFERENCES companies(company_id), UNIQUE(company_id,peer_company_id,group_name));
+CREATE INDEX IF NOT EXISTS idx_pl_year ON profitandloss(year); CREATE INDEX IF NOT EXISTS idx_bs_year ON balancesheet(year); CREATE INDEX IF NOT EXISTS idx_cf_year ON cashflow(year); CREATE INDEX IF NOT EXISTS idx_stock_date ON stock_prices(trade_date);
