@@ -87,3 +87,33 @@ Never commit real API secrets, database URLs or JWT secrets.
 
 ## Dataset note
 The currently supplied dataset upload contains AppleDouble `._` metadata/resource-fork files rather than the underlying spreadsheets, so the actual spreadsheet rows cannot yet be imported or validated. See the dataset analysis report for the current file-level assessment.
+
+
+## Submission Package
+
+For review/submission, the project is organized into four dedicated folders:
+
+```text
+Backend-implementation-PR-2/
+├── Source Code/
+│   ├── server.ts
+│   ├── schema.prisma
+│   ├── seed.ts
+│   ├── import-mdss.py
+│   └── package.json
+├── Datasets/
+│   ├── sample_village_hierarchy.csv
+│   └── README.md
+├── Documentation/
+│   ├── PROJECT_DOCUMENTATION.md
+│   ├── API_SPECIFICATION_REFERENCE.md
+│   ├── DATABASE_DESIGN.md
+│   ├── SECURITY_AND_RATE_LIMITING.md
+│   ├── DEPLOYMENT.md
+│   └── DEMO_CLIENT.md
+└── PPT / Slides/
+    ├── FINAL_VILLAGE_API_PRESENTATION.md
+    └── README.md
+```
+
+The `Source Code/` files mirror the existing implementation so reviewers can find the complete backend in one place. The `Datasets/` folder contains a clearly labeled synthetic demo CSV; use an authorized MDDS workbook for production import. The `PPT / Slides/` folder contains a presentation-ready deck outline.
