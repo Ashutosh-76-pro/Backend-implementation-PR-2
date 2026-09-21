@@ -1,0 +1,26 @@
+name: Package Submission ZIP
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'Ashutosh_Yadav_Submission/**'
+      - '.github/workflows/package-submission.yml'
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create submission ZIP
+        run: |
+          zip -r Ashutosh_Yadav_Submission.zip Ashutosh_Yadav_Submission
+
+      - name: Upload ZIP artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ashutosh_Yadav_Submission
+          path: Ashutosh_Yadav_Submission.zip
+          if-no-files-found: error
